@@ -159,6 +159,13 @@ test('if nothing changed, no previous value stored', function (t) {
 	t.is(post.get('title'), 'Sad title');
 });
 
+test('get changed attributes', function (t) {
+  let post = new Post({ title: 'Sad title', content: 'Sad content' });
+
+  post.set('title', 'Happy title');
+  t.same(post.getChangedAttributes(), { title: 'Sad title' });
+});
+
 test('setup an index', function * (t) {
 	yield* Post.index('title');
 
@@ -227,17 +234,19 @@ test('create with default values', function * (t) {
 });
 
 test('update', function * (t) {
-	let post = new Post({ awesome: true });
+	let post = new Post({ awesome: true, amazing: true});
 	yield* post.save();
 
 	post = yield* Post.findOne();
 	t.true(post.get('awesome'));
 
 	post.set('awesome', false);
+	post.attributes.amazing = false;
 	yield* post.save();
 
 	post = yield* Post.findOne();
 	t.false(post.get('awesome'));
+  t.true(post.get('amazing'));
 });
 
 test('update `updated_at` attribute', function * (t) {
